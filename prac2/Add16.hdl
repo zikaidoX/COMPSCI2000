@@ -16,8 +16,8 @@ PARTS:
     // Initialization of carry-in bit
     Or(a=false, b=false, out=carry0);
     
-    // Full adders for each bit, using cascade connections
-    FullAdder(a=carry0, b=a[0], c=b[0], sum=out[0], carry=carry1);
+    // Full adders for each bit
+    HalfAdder(a=carry0, b=a[0], c=b[0], sum=out[0], carry=carry1);
     FullAdder(a=carry1, b=a[1], c=b[1], sum=out[1], carry=carry2);
     FullAdder(a=carry2, b=a[2], c=b[2], sum=out[2], carry=carry3);
     FullAdder(a=carry3, b=a[3], c=b[3], sum=out[3], carry=carry4);
@@ -33,7 +33,11 @@ PARTS:
     FullAdder(a=carry13, b=a[13], c=b[13], sum=out[13], carry=carry14);
     FullAdder(a=carry14, b=a[14], c=b[14], sum=out[14], carry=carry15);
     FullAdder(a=carry15, b=a[15], c=b[15], sum=out[15], carry=carry16);
+
+    // Check if there's an overflow (carry-out from the most significant bit)
+    Or(a=carry15, b=carry16, out=carry_out);
     
-    // Calculate overflow by comparing carry-in and carry-out of the most significant bit
-    Xor(a=carry15, b=carry16, out=over);
+    // Set over output to 1 if there's an overflow
+    Not(in=carry_out, out=over);
+
 }
