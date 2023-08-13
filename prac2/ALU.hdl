@@ -42,21 +42,18 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-    // Zero or negate x input based on control bits
-    Mux16(a=x, b=false, sel=zx, out=x_zx);
-    Not16(in=x_zx, out=x_not);
-    Mux16(a=x_zx, b=x_not, sel=nx, out=x_final);
+      Mux16(a=x, sel=zx, out=x1);
+      Not16(in=x1, out=negatedX);
+      Mux16(a=x1, b=negatedX, sel=nx, out=x2);
 
-    // Zero or negate y input based on control bits
-    Mux16(a=y, b=false, sel=zy, out=y_zy);
-    Not16(in=y_zy, out=y_not);
-    Mux16(a=y_zy, b=y_not, sel=ny, out=y_final);
+      Mux16(a=y, sel=zy, out=y1);
+      Not16(in=y1, out=negatedY);
+      Mux16(a=y1, b=negatedY, sel=ny, out=y2);
 
-    // Perform addition (f=1) or bitwise AND (f=0)
-    Add16(a=x_final, b=y_final, out=add_out);
-    And16(a=x_final, b=y_final, out=and_out);
-    Mux16(a=and_out, b=add_out, sel=f, out=out_pre_not);
+      Add16(a=x2, b=y2, out=added);
+      And16(a=x2, b=y2, out=xyAnd);
+      Mux16(a=xyAnd, b=added, sel=f, out=result);
 
-    // Negate output based on control bit 'no'
-    Not16(in=out_pre_not, out=out);
+      Not16(in=result, out=negatedResult);
+      Mux16(a=result, b=negatedResult, sel=no, out=out, out[15]=firstOut, out[0..7]=finalLeft, out[8..15]=finalRight);
 }
