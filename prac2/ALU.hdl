@@ -42,18 +42,33 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-  Mux16(a=x, sel=zx, out=x1);
-  Not16(in=x1, out=negatedX);
-  Mux16(a=x1, b=negatedX, sel=nx, out=x2);
+    //Zeroing and Negating the x Input
+    Mux16(a=x, b=false, sel=zx, out=zeroed_x); 
+    Not16(in=zeroed_x, out=noted_x);                
+    Mux16(a=zeroed_x, b=noted_x, sel=nx, out=processed_x);    
 
-  Mux16(a=y, sel=zy, out=y1);
-  Not16(in=y1, out=negatedY);
-  Mux16(a=y1, b=negatedY, sel=ny, out=y2);
 
-  Add16(a=x2, b=y2, out=added);
-  And16(a=x2, b=y2, out=xyAnd);
-  Mux16(a=xyAnd, b=added, sel=f, out=result);
+    //Zeroing and Negating the y Input
+    Mux16(a=y, b=false, sel=zy, out=zeroed_y); 
+    Not16(in=zeroed_y, out=noted_y);                
+    Mux16(a=zeroed_y, b=noted_y, sel=ny, out=processed_y);   
 
-  Not16(in=result, out=negatedResult);
-  Mux16(a=result, b=negatedResult, sel=no, out=out);
-}
+    //Performing Arithmetic and Logical Operations
+    Add16(a=processed_x, b=processed_y, out=sum_x_y);
+    And16(a=processed_x, b=processed_y, out=and_x_y);
+
+    //Choosing the Function and Output
+    Mux16(a=and_x_y, b=sum_x_y, sel=f, out=selected_result);
+    Not16(in=selected_result, out=not_selected_result);
+    
+    //Choosing the Output and Handling Negation
+    Mux16(a=selected_result, b=not_selected_result, sel=no, out=output_result, out[0..7]=output_a, out[8..15]=output_b, out[15]=output_c);
+    And(a=output_c, b=true, out=negative_flag);
+
+    //Checking for Zero and Negative Outputs
+    Or8Way(in=output_a, out=or_result_a);
+    Or8Way(in=output_b, out=or_result_b);
+    Or(a=or_result_a, b=or_result_b, out=nonzero_result);
+    Not(in=nonzero_result, out=zero_flag);
+
+    }
