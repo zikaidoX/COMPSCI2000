@@ -42,18 +42,21 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-      Mux16(a=x, sel=zx, out=x1);
-      Not16(in=x1, out=negatedX);
-      Mux16(a=x1, b=negatedX, sel=nx, out=x2);
+    // Manipulate the x input
+    Mux16(a=x, b=false, sel=zx, out=xZeroed); // Zero x if zx == 1
+    Not16(in=xZeroed, out=xNot);              // Negate x if nx == 1
 
-      Mux16(a=y, sel=zy, out=y1);
-      Not16(in=y1, out=negatedY);
-      Mux16(a=y1, b=negatedY, sel=ny, out=y2);
+    // Manipulate the y input
+    Mux16(a=y, b=false, sel=zy, out=yZeroed); // Zero y if zy == 1
+    Not16(in=yZeroed, out=yNot);              // Negate y if ny == 1
 
-      Add16(a=x2, b=y2, out=added);
-      And16(a=x2, b=y2, out=xyAnd);
-      Mux16(a=xyAnd, b=added, sel=f, out=result);
+    // Perform the operation
+    Add16(a=xNot, b=yNot, out=addResult);  // Compute x + y
+    And16(a=xNot, b=yNot, out=andResult);  // Compute x & y
 
-      Not16(in=result, out=negatedResult);
-      Mux16(a=result, b=negatedResult, sel=no, out=out, out[15]=firstOut, out[0..7]=finalLeft, out[8..15]=finalRight);
+    Mux16(a=andResult, b=addResult, sel=f, out=operationResult);   // Select between x & y or x + y based on f
+
+    // Negate the output if necessary
+    Not16(in=operationResult, out=notResult);
+    Mux16(a=operationResult, b=notResult, sel=no, out=finalResult);
 }
