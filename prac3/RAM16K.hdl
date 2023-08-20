@@ -15,7 +15,8 @@ CHIP RAM16K {
     OUT out[16];
 
     PARTS:
-    // Instantiate four 4K-Word RAM chips
+    DMux4Way(in=load,sel=address[12..13],a=a,b=b,c=c,d=d);
+
     RAM4K(in=in, load=a, address=address[0..11], out=out0);
     RAM4K(in=in, load=b, address=address[0..11], out=out1);
     RAM4K(in=in, load=c, address=address[0..11], out=out2);
