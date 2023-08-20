@@ -15,7 +15,7 @@ CHIP RAM64 {
     OUT out[16];
 
     PARTS:
-    // Instantiate eight 8-Word RAM chips
+    DMux8Way(in=load,sel=address[3..5],a=a,b=b,c=c,d=d,e=e,f=f,g=g,h=h);
     RAM8(in=in, load=a, address=address[0..2], out=out0);
     RAM8(in=in, load=b, address=address[0..2], out=out1);
     RAM8(in=in, load=c, address=address[0..2], out=out2);
