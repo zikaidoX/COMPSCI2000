@@ -16,14 +16,14 @@ CHIP RAM64 {
 
     PARTS:
     // Instantiate eight 8-Word RAM chips
-    RAM8(in=in, load=load, address=address[0..2], out=out0);
-    RAM8(in=in, load=load, address=address[0..2], out=out1);
-    RAM8(in=in, load=load, address=address[0..2], out=out2);
-    RAM8(in=in, load=load, address=address[0..2], out=out3);
-    RAM8(in=in, load=load, address=address[0..2], out=out4);
-    RAM8(in=in, load=load, address=address[0..2], out=out5);
-    RAM8(in=in, load=load, address=address[0..2], out=out6);
-    RAM8(in=in, load=load, address=address[0..2], out=out7);
+    RAM8(in=in, load=a, address=address[0..2], out=out0);
+    RAM8(in=in, load=b, address=address[0..2], out=out1);
+    RAM8(in=in, load=c, address=address[0..2], out=out2);
+    RAM8(in=in, load=d, address=address[0..2], out=out3);
+    RAM8(in=in, load=e, address=address[0..2], out=out4);
+    RAM8(in=in, load=f, address=address[0..2], out=out5);
+    RAM8(in=in, load=g, address=address[0..2], out=out6);
+    RAM8(in=in, load=h, address=address[0..2], out=out7);
 
     // Create a Mux8Way16 to select the correct output
     Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7,

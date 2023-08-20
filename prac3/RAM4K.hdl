@@ -16,14 +16,14 @@ CHIP RAM4K {
 
     PARTS:
     // Instantiate eight 512-Word RAM chips
-    RAM512(in=in, load=load, address=address[0..8], out=out0);
-    RAM512(in=in, load=load, address=address[0..8], out=out1);
-    RAM512(in=in, load=load, address=address[0..8], out=out2);
-    RAM512(in=in, load=load, address=address[0..8], out=out3);
-    RAM512(in=in, load=load, address=address[0..8], out=out4);
-    RAM512(in=in, load=load, address=address[0..8], out=out5);
-    RAM512(in=in, load=load, address=address[0..8], out=out6);
-    RAM512(in=in, load=load, address=address[0..8], out=out7);
+    RAM512(in=in, load=a, address=address[0..8], out=out0);
+    RAM512(in=in, load=b, address=address[0..8], out=out1);
+    RAM512(in=in, load=c, address=address[0..8], out=out2);
+    RAM512(in=in, load=d, address=address[0..8], out=out3);
+    RAM512(in=in, load=e, address=address[0..8], out=out4);
+    RAM512(in=in, load=f, address=address[0..8], out=out5);
+    RAM512(in=in, load=g, address=address[0..8], out=out6);
+    RAM512(in=in, load=h, address=address[0..8], out=out7);
 
     // Create a Mux8Way16 to select the correct output
     Mux8Way16(a=out0, b=out1, c=out2, d=out3, e=out4, f=out5, g=out6, h=out7,

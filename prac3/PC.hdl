@@ -16,18 +16,13 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // 16-bit adder
-    Add16(a=out, b[0..14]=true, b[15]=false, out=addedOut);
-    
-    // D-flip-flop to store the counter value
-    DFF16(in=addedOut, load=load, out=counter);
+	Inc16(in=oo,out=incd);
 
-    // Incrementer
-    Inc16(in=counter, out=incremented);
+	Mux16(a=oo,b=incd,sel=inc,out=o);
 
-    // Mux to select the value to be loaded
-    Mux16(a=incremented, b=in, sel=inc, out=loadInput);
+	Mux16(a=o,b=in,sel=load,out=uu);
 
-    // Mux to select the value to be output as the next state
-    Mux16(a=loadInput, b=false, sel=reset, out=out);
+	Mux16(a=uu,b[0..15]=false,sel=reset,out=this);
+	
+	Register(in=this,load=true,out=out,out=oo);	
 }
