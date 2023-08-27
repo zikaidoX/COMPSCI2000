@@ -1,0 +1,56 @@
+// File name: Decode.hdl
+
+/**
+ * The instruction decoder determines the type of instruction (a or c)
+ * and decodes those instructions.
+ * The input in[16] is the instruction to be decoded.
+ * The outputs are used as follows:
+ *   type:      0 if a-instruction, 1 if c-instruction. 
+ *   a:         Determines whether the ALU input uses A (0) or Memory[A] (1)
+ *   c1 .. c6:  Op-code wires to ALU
+ *   d1 d2 d3:  Destination wires to the load pins of A,D registers and Memory
+ *   j1 j2 j3:  Jump wires to Jump Unit
+ * For a-instructions, d1 should be 1, all other outputs should be 0
+ * For c-instructions, outputs should correspond to their bits in the c-instruction
+ */
+
+CHIP Decode {
+
+    IN  in[16];             // instruction to decode
+
+    OUT type,               // Instruction type
+        a,                  // ALU A/M
+        c1,c2,c3,c4,c5,c6,  // Op-code wires to ALU
+        d1,d2,d3,           // Destination wires
+        j1,j2,j3;           // Jump wires
+
+PARTS:
+    //Determine instruction type
+    Mux(a=false, b=in[0], sel=type);
+    
+    // determine A/M control signal
+    Mux16(a=false, b=in, sel=type, out=mux_out);
+    Not(in=mux_out[5], out=a);
+    
+    // extract C-instruction control signals
+    And16(a=in, b=1111111111110000, out=opcode_bits);
+    And16(a=in, b=0000000000001111, out=dest_bits);
+    And16(a=in, b=0000000111100000, out=jump_bits);
+    
+    // distribute opcode bits to control wires
+    And(a=opcode_bits[0], b=1, out=c1);
+    And(a=opcode_bits[1], b=1, out=c2);
+    And(a=opcode_bits[2], b=1, out=c3);
+    And(a=opcode_bits[3], b=1, out=c4);
+    And(a=opcode_bits[4], b=1, out=c5);
+    And(a=opcode_bits[5], b=1, out=c6);
+    
+    // distribute destination bits to control wires
+    And(a=dest_bits[0], b=1, out=d1);
+    And(a=dest_bits[1], b=1, out=d2);
+    And(a=dest_bits[2], b=1, out=d3);
+    
+    //Distribute jump bits to control wires
+    And(a=jump_bits[0], b=1, out=j1);
+    And(a=jump_bits[1], b=1, out=j2);
+    And(a=jump_bits[2], b=1, out=j3);}
