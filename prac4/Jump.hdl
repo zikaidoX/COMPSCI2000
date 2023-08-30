@@ -26,6 +26,17 @@ CHIP Jump {
 
     OUT jump;           // true if a jump should be performed, false otherwise 
 
-PARTS:
-    // Put your code here:
+    PARTS:
+    // Implement the logic for the jump conditions
+    // If any of j1, j2, or j3 is true AND the corresponding ALU condition is met,
+    // then set the jump output to true.
+
+    // Combine conditions for jumps
+    AND(a = j1, b = ng, out = j1_ng);
+    AND(a = j2, b = zr, out = j2_zr);
+    AND(a = j3, b = Not(zr), out = j3_not_zr);
+
+    // Combine j1, j2, and j3 conditions
+    OR(a = j1_ng, b = j2_zr, out = j1_ng_or_j2_zr);
+    OR(a = j1_ng_or_j2_zr, b = j3_not_zr, out = jump);
 }
