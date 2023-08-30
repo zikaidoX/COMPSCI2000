@@ -25,27 +25,29 @@ CHIP Decode {
         j1,j2,j3;           // Jump wires
 
 PARTS:
-    // Determine the instruction type (A-instruction or C-instruction)
-    Mux(a=and(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15]), b=NOT(in[0]), sel=NOT(in[0]), out=type);
+    Mux16(a=0, b=in, sel=in[15..15], out=type);  // Extract the most significant bit as the instruction type
 
-    // Set the 'a' output to 0 for A-instructions and 1 for C-instructions
-    Mux(a=false, b=true, sel=type, out=a);
+    // Determine whether the instruction is an A-instruction (type=0) or C-instruction (type=1)
+    Mux16(a=0, b=in, sel=type, out=ainstruction);
+    Mux16(a=0, b=ainstruction, sel[0..0], out=a);
 
-    // Decode the C-instruction op-code bits
-    Mux(a=in[10], b=in[9], sel=type, out=c1);
-    Mux(a=in[8], b=in[7], sel=type, out=c2);
-    Mux(a=in[6], b=in[5], sel=type, out=c3);
-    Mux(a=in[4], b=in[3], sel=type, out=c4);
-    Mux(a=in[2], b=in[1], sel=type, out=c5);
-    Mux(a=in[0], b=false, sel=type, out=c6);
+    // Extract control signals for C-instructions
+    // Op-code wires to ALU
+    Mux16(a=0, b=in, sel=type, out=cinstruction);
+    And16(a=cinstruction, b[15..15]=0, out=opcode_bits);  // Extract bits c1..c6
+    DMux4Way(in=opcode_bits, sel=cinstruction[3..1], a=c1, b=c2, c=c3, d=c4);
+    And16(a=opcode_bits, b=Not16(And(a=cinstruction[3..3], b=cinstruction[0..0])), out=c5);
+    And16(a=opcode_bits, b=cinstruction[3..3], out=c6);
 
-    // Decode the C-instruction destination bits
-    Mux(a=in[15], b=in[14], sel=type, out=d1);
-    Mux(a=in[13], b=in[12], sel=type, out=d2);
-    Mux(a=in[11], b=in[10], sel=type, out=d3);
+    // Destination wires
+    And16(a=cinstruction, b[15..14]=0, out=dest_bits);  // Extract bits d1..d3
+    And(a=dest_bits[0..0], b=Not16(type), out=d1);
+    And(a=dest_bits[1..1], b=Not16(type), out=d2);
+    And(a=dest_bits[2..2], b=Not16(type), out=d3);
 
-    // Decode the C-instruction jump bits
-    Mux(a=in[15], b=in[14], sel=type, out=j1);
-    Mux(a=in[13], b=in[12], sel=type, out=j2);
-    Mux(a=in[11], b=in[10], sel=type, out=j3);
+    // Jump wires
+    And16(a=cinstruction, b[15..13]=0, out=jump_bits);  // Extract bits j1..j3
+    And(a=jump_bits[0..0], b=type, out=j1);
+    And(a=jump_bits[1..1], b=type, out=j2);
+    And(a=jump_bits[2..2], b=type, out=j3);
 }
