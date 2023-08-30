@@ -27,12 +27,26 @@ CHIP Jump {
     OUT jump;           // true if a jump should be performed, false otherwise 
 
     PARTS:
-        Or(a=j1, b=j2, out=or_j1_j2);
-        Or(a=or_j1_j2, b=j3, out=jump_condition);
-        And(a=jump_condition, b=zr, out=should_jump_zr);
-        And(a=jump_condition, b=ng, out=should_jump_ng);
-        Not(in=zr, out=not_zr);
-        Not(in=ng, out=not_ng);
-        And(a=not_zr, b=not_ng, out=should_jump_positive);
-        Or(a=should_jump_zr, b=should_jump_positive, out=jump);
+
+    // Logic to determine whether a jump should occur
+    OR(a=j1, b=j2, out=jump_j1_or_j2);     // (j1 || j2)
+    OR(a=jump_j1_or_j2, b=j3, out=jump_condition); // (j1 || j2) || j3
+
+    // Logic to determine if the ALU output is < 0
+    NOT(in=ng, out=not_ng);
+    AND(a=not_ng, b=j1, out=jump_if_ng_and_j1); // !ng && j1
+
+    // Logic to determine if the ALU output is == 0
+    NOT(in=zr, out=not_zr);
+    AND(a=zr, b=j2, out=jump_if_zr_and_j2); // zr && j2
+
+    // Logic to determine if the ALU output is > 0
+    NOT(in=ng, out=not_ng_for_pos);
+    AND(a=not_ng_for_pos, b=not_zr, out=jump_if_pos); // !ng && !zr
+
+    // Combining the conditions to decide whether to jump
+    OR(a=jump_if_ng_and_j1, b=jump_if_zr_and_j2, out=jump_if_ng_or_zr); // (ng && j1) || (zr && j2)
+    OR(a=jump_if_ng_or_zr, b=jump_if_pos, out=jump_if_any_condition);    // (ng && j1) || (zr && j2) || (!ng && !zr)
+
+    AND(a=jump_condition, b=jump_if_any_condition, out=jump); // (j1 || j2 || j3) && ((ng && j1) || (zr && j2) || (!ng && !zr))
 }
