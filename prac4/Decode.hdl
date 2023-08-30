@@ -25,31 +25,27 @@ CHIP Decode {
         j1,j2,j3;           // Jump wires
 
 PARTS:
-    // Determine instruction type (A or C)
-    Not(in=in[0], out=type);
+    // Determine the instruction type (A-instruction or C-instruction)
+    Mux(a=and(in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], in[10], in[11], in[12], in[13], in[14], in[15]), b=NOT(in[0]), sel=NOT(in[0]), out=type);
 
-    // For A-instructions
-    Mux16(a=false, b=in, sel=type, out=a);
+    // Set the 'a' output to 0 for A-instructions and 1 for C-instructions
+    Mux(a=false, b=true, sel=type, out=a);
 
-    // For C-instructions
-    Mux16(a=false, b=in, sel=type, out=c1_16);
-    And16(a=c1_16, b[0]=true, out=c1);
+    // Decode the C-instruction op-code bits
+    Mux(a=in[10], b=in[9], sel=type, out=c1);
+    Mux(a=in[8], b=in[7], sel=type, out=c2);
+    Mux(a=in[6], b=in[5], sel=type, out=c3);
+    Mux(a=in[4], b=in[3], sel=type, out=c4);
+    Mux(a=in[2], b=in[1], sel=type, out=c5);
+    Mux(a=in[0], b=false, sel=type, out=c6);
 
-    // Decode ALU op-code bits
-    And16(a=in, b[4..0]=111111, out=alu_op);
-    And(a=alu_op[0], b=Not(type), out=c2);
-    And(a=alu_op[1], b=Not(type), out=c3);
-    And(a=alu_op[2], b=Not(type), out=c4);
-    And(a=alu_op[3], b=Not(type), out=c5);
-    And(a=alu_op[4], b=Not(type), out=c6);
+    // Decode the C-instruction destination bits
+    Mux(a=in[15], b=in[14], sel=type, out=d1);
+    Mux(a=in[13], b=in[12], sel=type, out=d2);
+    Mux(a=in[11], b=in[10], sel=type, out=d3);
 
-    // Decode destination bits
-    And(a=in[15], b[0]=true, out=d1);
-    And(a=in[14], b[0]=true, out=d2);
-    And(a=in[13], b[0]=true, out=d3);
-
-    // Decode jump bits
-    And(a=in[15], b=in[14]=in[13]=false, out=j1);
-    And(a=in[15], b=in[14]=in[13]=true, out=j2);
-    And(a=in[15], b=in[14]=false, b=in[13]=true, out=j3);
+    // Decode the C-instruction jump bits
+    Mux(a=in[15], b=in[14], sel=type, out=j1);
+    Mux(a=in[13], b=in[12], sel=type, out=j2);
+    Mux(a=in[11], b=in[10], sel=type, out=j3);
 }
