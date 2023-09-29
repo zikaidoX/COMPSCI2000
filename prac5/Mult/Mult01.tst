@@ -1,15 +1,15 @@
-load Mult.asm,
-output-file Mult01.out,
-compare-to Mult01.cmp,
-output-list RAM[0]%D2.6.2 RAM[1]%D2.6.2 RAM[2]%D2.6.2;
+// Set R1 to -5
+@-5
+D=A
+@R1
+M=D
 
-set PC 0,
-set RAM[0] 0,    // Set R0
-set RAM[1] -5,   // Set R1 to a negative integer (-5)
-set RAM[2] 3;    // Set R2 to a positive integer (3)
-repeat 200 {
-  ticktock;      // Run for 200 clock cycles
-}
-set RAM[1] -5,   // Restore arguments in case program used them
-set RAM[2] 3,
-output;          // Output to file
+// Set R2 to 3
+@3
+D=A
+@R2
+M=D
+
+// Load the program at address 0 and start execution
+@0
+0;JMP
