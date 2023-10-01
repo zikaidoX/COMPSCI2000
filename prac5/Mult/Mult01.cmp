@@ -1,13 +1,2 @@
-// Compare the value in R0 with the expected result (-15)
-@-15
-D=A
-@R0
-D=M+D
-
-// If the result in R0 matches the expected result, halt the program
-@END
-D;JEQ
-
-// If the result in R0 does not match the expected result, go into an infinite loop
-@LOOP
-0;JMP
+|  RAM[0]  |  RAM[1]  |  RAM[2]  |
+|     -15  |       5  |      -3  |
