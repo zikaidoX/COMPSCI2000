@@ -1,36 +1,34 @@
 // Calculates y = |x|
 // x & y are static variables
+  
+  push static 0
+  pop local 0
+  
+  // Check if x is negative
+  push local 0
+  push constant 0
+  lt
 
-push static 0
+  // If x is negative, multiply it by -1 to make it positive
+  if-goto IS_NEGATIVE
+    push local 0
+    push constant -1
+    call Mult.multiply 2  // Call multiplication function to multiply x by -1
+    pop local 0  // Store the result back in local variable 0
 
-push static 1
+  // Store the absolute value (x or -x) in y (static variable 1)
+  push local 0
+  pop static 1
 
-eq
+  // Infinite loop to halt the function execution
+  label END
+  goto END
 
-if-goto IfTrue
-
-goto IfFalse
-
-IfTrue:
-
-push static 0
-
-push static 0
-
-sub
-
-pop static 1
-
-goto EndIf
-
-IfFalse:
-
-push static 0
-
-EndIf:
-
-pop static 0
-
-push static 1
-
-return
+  // Label for negative number case
+  label IS_NEGATIVE
+    push local 0
+    neg
+    pop local 0  // Store the absolute value (x or -x) in local variable 0
+    push local 0
+    pop static 1  // Store the absolute value in y (static variable 1)
+    goto END
