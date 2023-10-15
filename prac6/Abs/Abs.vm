@@ -1,28 +1,22 @@
 // Calculates y = |x|
 // x & y are static variables
 
-push constant 256
-pop sp
-push constant 300
-pop local 0
-push constant 400
-pop argument 0
-push constant 3000
-pop this 0
-push constant 3010
-pop that 0
-// Load x onto the stack
-push static 0
-// Check if x is negative
-neg
-if-goto NEGATIVE
-// x is non-negative, so set y to x
-push static 0
-goto END
-// x is negative, so set y to -x
-label NEGATIVE
-push static 0
-neg
+// Step 1: Calculate the absolute value of x and store it in y
+// x is a local variable, y is also a local variable used to store the absolute value
+
+// Step 2: Check if x is negative
+push local 0 // Push x
+push constant 0 // Push 0 for comparison
+lt // Check if x < 0
+if-goto IS_NEGATIVE // If x is negative, go to IS_NEGATIVE label
+goto END_ABSOLUTE // If x is non-negative, go to END_ABSOLUTE label
+
+(IS_NEGATIVE)
+// Step 3: Multiply x by -1 to make it positive
+push local 0 // Push x
+push constant -1 // Push -1 for multiplication
+call Mult.multiply 2 // Call a multiplication function to multiply x by -1
+pop local 1 // Store the result in y
 
 label END
 goto END
