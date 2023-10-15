@@ -2,33 +2,38 @@
 // a is a local variable
 // x & y are static variables
 
-function Mult.multiply 0
-push constant 0     // Initialize the result (accumulator) to 0
-pop local 0          // Store the initial value of the result in the local variable a
-
-push static 0        // Push the value of x (first number) onto the stack
-push static 1        // Push the value of y (second number) onto the stack
-pop temp 0           // Pop y into temp 0
-pop temp 1           // Pop x into temp 1
-
-label LOOP_START
-push temp 1          // Push x onto the stack
+// Initialize a to 0
 push constant 0
-eq
-if-goto LOOP_END     // If x == 0, exit the loop
+pop local 0
 
-push temp 0          // Push y onto the stack
-add
-pop temp 0           // Update the value of y by adding the original y to itself
+// Input value for x
+push static 0
+pop argument 0
 
-push temp 1          // Push x onto the stack
-push constant 1
-sub
-pop temp 1           // Decrement x by 1
-goto LOOP_START      // Repeat the loop
+// Input value for y
+push static 1
+pop argument 1
 
-label LOOP_END
-pop local 0          // Store the final result (y * original x) in the local variable a
+// Loop to multiply x and y
+(INIT_LOOP)
+  // Check if y is 0 (base case)
+  push argument 1
+  if-goto END // Jump to END if y is 0
+
+  // Add x to a
+  push local 0
+  push argument 0
+  add
+  pop local 0
+
+  // Decrement y
+  push argument 1
+  push constant 1
+  sub
+  pop argument 1
+
+  // Repeat the loop
+  goto INIT_LOOP
 
 
 label END
