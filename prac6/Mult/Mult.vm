@@ -1,0 +1,36 @@
+// Calculates a = x*y
+// a is a local variable
+// x & y are static variables
+
+// Initialize a to 0
+push constant 0
+pop local 0  // a = 0
+
+// Loop to multiply x and y
+push static 17  // push y onto the stack
+push constant 0  // i = 0
+label LOOP_START
+  // Check if i >= y, if true, exit the loop
+  push local 1  // push i
+  push static 17  // push y
+  lt
+  if-goto LOOP_END
+
+  // Add x to a
+  push local 0  // push a
+  push static 16  // push x
+  add
+  pop local 0  // a = a + x
+
+  // Increment i
+  push local 1  // push i
+  push constant 1
+  add
+  pop local 1  // i = i + 1
+
+  // Repeat the loop
+  goto LOOP_START
+label LOOP_END
+
+label END
+goto END
