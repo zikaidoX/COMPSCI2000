@@ -20,12 +20,41 @@ VMTranslator::~VMTranslator() {
 
 /** Generate Hack Assembly code for a VM push operation */
 string VMTranslator::vm_push(string segment, int offset){
-    return "";
+        """Generate Hack Assembly code for a VM push operation"""
+        if segment == "constant":
+            return f"@{offset}\nD=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "local":
+            return f"@LCL\nD=M\n@{offset}\nA=D+A\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "argument":
+            return f"@ARG\nD=M\n@{offset}\nA=D+A\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "this":
+            return f"@THIS\nD=M\n@{offset}\nA=D+A\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "that":
+            return f"@THAT\nD=M\n@{offset}\nA=D+A\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "temp":
+            return f"@R{5+offset}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "pointer":
+            if offset == 0:
+                return f"@THIS\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+            elif offset == 1:
+                return f"@THAT\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
+        elif segment == "static":
+            return f"@{VMTranslator.get_static_label(offset)}\nD=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n"
 }
 
 /** Generate Hack Assembly code for a VM pop operation */
 string VMTranslator::vm_pop(string segment, int offset){    
-    return "";
+        """Generate Hack Assembly code for a VM pop operation"""
+        if segment == "local":
+            return f"@LCL\nD=M\n@{offset}\nD=D+A\n@R13\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D\n"
+        elif segment == "argument":
+            return f"@ARG\nD=M\n@{offset}\nD=D+A\n@R13\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D\n"
+        elif segment == "this":
+            return f"@THIS\nD=M\n@{offset}\nD=D+A\n@R13\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D\n"
+        elif segment == "that":
+            return f"@THAT\nD=M\n@{offset}\nD=D+A\n@R13\nM=D\n@SP\nM=M-1\nA=M\nD=M\n@R13\nA=M\nM=D\n"
+        elif segment == "temp":
+            return f"@SP\nM=M-1\nA=M\nD=M\n@R{5+offset}\""
 }
 
 /** Generate Hack Assembly code for a VM add operation */
