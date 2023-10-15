@@ -2,63 +2,55 @@
 // a & b are both supplied as arguments
 
 function ArrMax.arrMax 2
+    push local 0
+    push argument 0
+    add
+    pop pointer 1
 
-// Argument 0: Pointer to the array
-// Argument 1: Number of elements in the array
+    push that 0
+    pop local 1
 
-// Initialize max to the first element of the array
-push argument 0  // push pointer to the array
-pop pointer 0     // set THIS pointer to the array
-push that 0       // push the first element of the array
-pop local 0       // store the first element as max
+    push constant 1
+    pop local 2
 
-// Initialize loop variables
-push constant 1   // i = 1 (start from the second element)
-pop local 1
+    label LOOP_START
+    push local 2
+    push argument 1
+    lt
+    not
+    if-goto LOOP_END
 
-label LOOP_START
-  // Check if i >= n (number of elements in the array)
-  push local 1     // push i
-  push argument 1  // push n
-  lt
-  if-goto LOOP_END // exit loop if i >= n
+    push local 2
+    push local 0
+    add
+    pop pointer 1
 
-  // Access the current element of the array (a[i])
-  push argument 0  // push pointer to the array
-  push local 1     // push i
-  add             // calculate the address of a[i]
-  pop pointer 1    // set THAT pointer to a[i]
-  push that 0       // push a[i]
+    push that 0
+    push local 1
+    gt
+    if-goto UPDATE_MAX
 
-  // Compare the current element with max
-  push local 0     // push max
-  lt               // if a[i] < max
-  if-goto UPDATE_MAX
+    goto CONTINUE_LOOP
 
-  // If a[i] >= max, continue to the next iteration
-  goto CONTINUE_LOOP
+    label UPDATE_MAX
+    push local 2
+    push local 0
+    add
+    pop pointer 1
 
-label UPDATE_MAX
-  // Update max with the current element (a[i])
-  pop local 0       // update max with a[i]
+    push that 0
+    pop local 1
 
-label CONTINUE_LOOP
-  // Increment i
-  push local 1     // push i
-  push constant 1  // push 1
-  add
-  pop local 1      // i = i + 1
+    label CONTINUE_LOOP
+    push local 2
+    push constant 1
+    add
+    pop local 2
+    goto LOOP_START
 
-  // Repeat the loop
-  goto LOOP_START
-
-label LOOP_END
-
-// Return the maximum element
-push local 0      // push max
-return
-
-// End of ArrMax.arrMax function
+    label LOOP_END
+    push local 1
+    return
 
 label END
 goto END
