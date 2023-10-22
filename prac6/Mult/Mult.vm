@@ -1,49 +1,32 @@
-// Initializes this, that, and argument pointers
-push constant 0
-pop pointer 0
-push constant 300
-pop pointer 1
-push argument 0
-pop pointer 2
+// Mult.vm
 
-// Load x and y into the stack
-push static 0
-push static 1
+// Declare variables
+push static 0 // Push x onto the stack
+push static 1 // Push y onto the stack
+pop argument 0 // Pop y into ARG 0
+pop argument 1 // Pop x into ARG 1
+push constant 0 // Initialize the result (a) to 0
+pop local 0 // Pop the result into local variable a
 
-// Set up loop counter
-push constant 0
-pop local 3
+// Loop to multiply x and y
+label LOOP_START
+  // Check if y is zero, if yes, exit the loop
+  push argument 1
+  if-goto LOOP_END
 
-// Loop to calculate x * y
-(loopStart)
-  // Check if the loop counter is equal to y - 1
-  push local 3
-  push static 1
-  sub
-  eq
-
-  // If equal, jump to end of loop
-  if-goto loopEnd
-
-  // Add x to the result
-  push local 2
-  push static 0
+  // Add x to the result (a) and decrement y by 1
+  push local 0
+  push argument 0
   add
-  pop local 2
-
-  // Increment the loop counter
-  push local 3
+  pop local 0
+  push argument 1
   push constant 1
-  add
-  pop local 3
+  sub
+  pop argument 1
 
-  // Jump back to the start of the loop
-  goto loopStart
+  // Repeat the loop
+  goto LOOP_START
 
-(loopEnd)
-// Set the result to the local variable a
-push local 2
-pop local 0
+label LOOP_END
 
-// End of multiplication algorithm
-label END
+// End of multiplication, the result is stored in local variable a
