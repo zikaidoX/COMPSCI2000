@@ -2,39 +2,49 @@
 // a is a local variable
 // x & y are static variables
 
-// Initialize a to 0
+// Set up local variables
 push constant 0
 pop local 0
+push constant 0
+pop local 1
+push constant 0
+pop local 2
 
-// Input value for x
+// Load x and y into the stack
 push static 0
-pop argument 0
-
-// Input value for y
 push static 1
-pop argument 1
 
-// Loop to multiply x and y
-(INIT_LOOP)
-  // Check if y is 0 (base case)
-  push argument 1
-  if-goto END // Jump to END if y is 0
+// Set up loop counter
+push constant 0
+pop local 3
 
-  // Add x to a
-  push local 0
-  push argument 0
+// Loop to calculate x * y
+(MULT_LOOP)
+  // Check if the loop counter is equal to y
+  push local 3
+  push static 1
+  eq
+  if-goto END_MULT_LOOP
+
+  // Add x to the result
+  push local 2
+  push static 0
   add
-  pop local 0
+  pop local 2
 
-  // Decrement y
-  push argument 1
+  // Increment the loop counter
+  push local 3
   push constant 1
-  sub
-  pop argument 1
+  add
+  pop local 3
 
-  // Repeat the loop
-  goto INIT_LOOP
+  goto MULT_LOOP
 
+// Set the result to the local variable a
+(END_MULT_LOOP)
+push local 2
+pop local 0
 
+// End of multiplication algorithm
 label END
 goto END
