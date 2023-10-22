@@ -1,14 +1,10 @@
-// Calculates a = x*y
-// a is a local variable
-// x & y are static variables
-
-// Set up local variables
+// Initializes this, that, and argument pointers
 push constant 0
-pop local 0
-push constant 0
-pop local 1
-push constant 0
-pop local 2
+pop pointer 0
+push constant 300
+pop pointer 1
+push argument 0
+pop pointer 2
 
 // Load x and y into the stack
 push static 0
@@ -19,12 +15,15 @@ push constant 0
 pop local 3
 
 // Loop to calculate x * y
-(MULT_LOOP)
-  // Check if the loop counter is equal to y
+(loopStart)
+  // Check if the loop counter is equal to y - 1
   push local 3
   push static 1
+  sub
   eq
-  if-goto END_MULT_LOOP
+
+  // If equal, jump to end of loop
+  if-goto loopEnd
 
   // Add x to the result
   push local 2
@@ -38,13 +37,13 @@ pop local 3
   add
   pop local 3
 
-  goto MULT_LOOP
+  // Jump back to the start of the loop
+  goto loopStart
 
+(loopEnd)
 // Set the result to the local variable a
-(END_MULT_LOOP)
 push local 2
 pop local 0
 
 // End of multiplication algorithm
 label END
-goto END
