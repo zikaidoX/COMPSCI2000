@@ -117,59 +117,70 @@ class CompilerParser:
     
 
     def compileSubroutine(self):
-    class_compileSub = ParseTree("subroutine", "")
-    current_tk = self.current()
-
-    if current_tk.getType() == "keyword" and current_tk.getValue() == "constructor":
-        class_compileSub.addChild(Token("keyword", "constructor"))
-    elif current_tk.getType() == "keyword" and current_tk.getValue() == "function":
-        class_compileSub.addChild(Token("keyword", "function"))
-    elif current_tk.getType() == "keyword" and current_tk.getValue() == "method":
-        class_compileSub.addChild(Token("keyword", "method"))
-    else:
-        raise ParseException()
-
-    self.next()
-    current_tk = self.current()
-
-    if current_tk.getType() == "keyword" and current_tk.getValue() == "void":
-        class_compileSub.addChild(Token("keyword", "void"))
-    elif current_tk.getType() == "keyword" and current_tk.getValue() in ["int", "char", "boolean"]:
-        class_compileSub.addChild(Token("keyword", current_tk.getValue()))
-    elif current_tk.getType() == "identifier":
-        class_compileSub.addChild(Token(current_tk.getType(), current_tk.getValue()))
-    else:
-        raise ParseException()
-
-    self.next()
-    current_tk = self.current()
-
-    if current_tk.getType() == "identifier":
-        class_compileSub.addChild(Token("identifier", current_tk.getValue()))
-    else:
-        raise ParseException()
-
-    self.next()
-    current_tk = self.current()
-
-    self.mustBe("symbol", "(")
-    class_compileSub.addChild(Token("symbol", current_tk.getValue()))
-
-    current_tk = self.current()
-
-    if current_tk.getType() in ["keyword", "identifier"]:
-        class_compileSub.addChild(self.compileParameterList())
+        """
+        Generates a parse tree for a method, function, or constructor
+        @return a ParseTree that represents the method, function, or constructor
+        """
+        class_compileSub = ParseTree("subroutine", "")
         current_tk = self.current()
 
-    self.mustBe("symbol", ")")
-    class_compileSub.addChild(Token("symbol", ")"))
+        if current_tk.getType() == "keyword" and current_tk.getValue() == "constructor":
+            class_compileSub.addChild(Token("keyword","constructor"))
+        elif current_tk.getType() == "keyword" and current_tk.getValue() =="function":
+            class_compileSub.addChild(Token("keyword","function"))
+        elif current_tk.getType() == "keyword" and current_tk.getValue() == "method":
+            class_compileSub.addChild(Token("keyword", "method"))
+        else:
+            raise ParseException()
+        
+        self.next()
+        current_tk = self.current()
 
-    self.next()
+#add type here?
+        if current_tk.getType() == "keyword" and current_tk.getValue() == "void":
+            class_compileSub.addChild(Token("keyword", "void"))
+        elif current_tk.getType() == "keyword" and current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean":
+            class_compileSub.addChild(Token("keyword", current_tk.getValue()))
+        elif current_tk.getType() == "identifier": 
+            class_compileSub.addChild(Token(current_tk.getType(), current_tk.getValue()))
+        else:
+            raise ParseException()
+        
+        self.next()
+        current_tk = self.current()
 
-    class_compileSub.addChild(self.compileSubroutineBody())
+# subroutine name? 
+        if current_tk.getType() == "identifier":
+            class_compileSub.addChild(Token("identifier", current_tk.getValue()))
+        else: 
+            raise ParseException()
+        
+# 
+        self.next()
+        current_tk = self.current()
+        #start of parameter list?
+        self.mustBe("symbol","(")
+        class_compileSub.addChild(Token("symbol",current_tk.getValue()))
 
-    return class_compileSub
+        # self.next()
+        current_tk = self.current()
+# part is getting stuck, is there a missing type here?
+        if current_tk.getType() == "keyword" and current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean" or current_tk.getType()=="identifier":
+            class_compileSub.addChild(self.compileParameterList())
+            current_tk = self.current()
 
+            
+
+
+        self.mustBe("symbol",")") #symbol breaks here, it's supposed to be a { but only ( works
+        class_compileSub.addChild(Token("symbol",")"))
+        
+        self.next()
+        # current_tk = self.current()
+
+        class_compileSub.addChild(self.compileSubroutineBody())
+
+        return class_compileSub 
     
     
     def compileParameterList(self):
