@@ -117,138 +117,120 @@ class CompilerParser:
     
 
     def compileSubroutine(self):
-        """
-        Generates a parse tree for a method, function, or constructor
-        @return a ParseTree that represents the method, function, or constructor
-        """
         class_compileSub = ParseTree("subroutine", "")
         current_tk = self.current()
 
         if current_tk.getType() == "keyword" and current_tk.getValue() == "constructor":
-            class_compileSub.addChild(Token("keyword","constructor"))
-        elif current_tk.getType() == "keyword" and current_tk.getValue() =="function":
-            class_compileSub.addChild(Token("keyword","function"))
+            class_compileSub.addChild(Token("keyword", "constructor"))
+        elif current_tk.getType() == "keyword" and current_tk.getValue() == "function":
+            class_compileSub.addChild(Token("keyword", "function"))
         elif current_tk.getType() == "keyword" and current_tk.getValue() == "method":
             class_compileSub.addChild(Token("keyword", "method"))
         else:
             raise ParseException()
-        
+
         self.next()
         current_tk = self.current()
 
-#add type here?
         if current_tk.getType() == "keyword" and current_tk.getValue() == "void":
             class_compileSub.addChild(Token("keyword", "void"))
-        elif current_tk.getType() == "keyword" and current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean":
+        elif current_tk.getType() == "keyword" and (current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean"):
             class_compileSub.addChild(Token("keyword", current_tk.getValue()))
-        elif current_tk.getType() == "identifier": 
+        elif current_tk.getType() == "identifier":
             class_compileSub.addChild(Token(current_tk.getType(), current_tk.getValue()))
         else:
             raise ParseException()
-        
+
         self.next()
         current_tk = self.current()
 
-# subroutine name? 
         if current_tk.getType() == "identifier":
             class_compileSub.addChild(Token("identifier", current_tk.getValue()))
-        else: 
+        else:
             raise ParseException()
-        
-# 
+
         self.next()
         current_tk = self.current()
-        #start of parameter list?
-        self.mustBe("symbol","(")
-        class_compileSub.addChild(Token("symbol",current_tk.getValue()))
 
-        # self.next()
+        self.mustBe("symbol", "(")
+        class_compileSub.addChild(Token("symbol", "("))
+        self.next()
+
         current_tk = self.current()
-# part is getting stuck, is there a missing type here?
-        if current_tk.getType() == "keyword" and current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean" or current_tk.getType()=="identifier":
+
+        if current_tk.getType() == "keyword" and (current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean" or current_tk.getType() == "identifier"):
             class_compileSub.addChild(self.compileParameterList())
             current_tk = self.current()
 
-            
+        self.mustBe("symbol", ")")
+        class_compileSub.addChild(Token("symbol", ")"))
 
-
-        self.mustBe("symbol",")") #symbol breaks here, it's supposed to be a { but only ( works
-        class_compileSub.addChild(Token("symbol",")"))
-        
-        # self.next()
-        # current_tk = self.current()
+        self.next()  # Advance to the next token
 
         class_compileSub.addChild(self.compileSubroutineBody())
 
-        return class_compileSub 
+        return class_compileSub
     
     
-   def compileParameterList(self):
-    """
-    Generates a parse tree for a subroutine's parameters
-    @return a ParseTree that represents a subroutine's parameters
-    """
-    class_compileParamList = ParseTree("parameterList", "")
-    current_tk = self.current()
-
-    if current_tk.getType() == "keyword" or current_tk.getType() == "identifier":
-        class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
-        self.next()
-    else:
-        raise ParseException()
-
-    while self.have("symbol", ","):
-        class_compileParamList.addChild(Token("symbol", ","))
-        self.next()
+    def compileParameterList(self):
+        class_compileParamList = ParseTree("parameterList", "")
         current_tk = self.current()
 
-        if current_tk.getType() == "keyword" and (current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean"):
-            class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
-            self.next()
-        elif current_tk.getType() == "identifier":
+        if current_tk.getType() == "keyword" or current_tk.getType() == "identifier":
             class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
             self.next()
         else:
             raise ParseException()
 
-    return class_compileParamList
+        current_tk = self.current()
+
+        if current_tk.getType() == "identifier":
+            class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
+            self.next()
+        else:
+            raise ParseException()
+
+        while self.have("symbol", ","):
+            class_compileParamList.addChild(Token("symbol", ","))
+            self.next()
+            current_tk = self.current()
+
+            if current_tk.getType() == "keyword" and (current_tk.getValue() == "int" or current_tk.getValue() == "char" or current_tk.getValue() == "boolean"):
+                class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
+                self.next()
+            elif current_tk.getType() == "identifier":
+                class_compileParamList.addChild(Token(current_tk.getType(), current_tk.getValue()))
+                self.next()
+            else:
+                raise ParseException()
+
+        return class_compileParamList
     
     
     def compileSubroutineBody(self):
-        """
-        Generates a parse tree for a subroutine's body
-        @return a ParseTree that represents a subroutine's body
-        """
         comp_subroutineBody = ParseTree("subroutineBody", "")
         current_tk = self.current()
-#here
-            
+
         self.mustBe("symbol", "{")
         comp_subroutineBody.addChild(Token("symbol", "{"))
-
-        #self.next()
-        current_tk = self.current()
-
+        self.next()
 
         while current_tk.getType() == "keyword" and current_tk.getValue() == "var":
             comp_subroutineBody.addChild(self.compileVarDec())
             current_tk = self.current()
-            #self.next()
+            self.next()
 
-
-        while current_tk.getType() == "keyword" and current_tk.getValue() == "let" or current_tk.getValue() == "if" or current_tk.getValue() == "while" or current_tk.getValue() == "do" or current_tk.getValue() == "return":
-            comp_subroutineBody(self.compileStatements())
+        while current_tk.getType() == "keyword" and (current_tk.getValue() == "let" or current_tk.getValue() == "if" or current_tk.getValue() == "while" or current_tk.getValue() == "do" or current_tk.getValue() == "return"):
+            comp_subroutineBody.addChild(self.compileStatements())
             current_tk = self.current()
             self.next()
 
-
         self.mustBe("symbol", "}")
         comp_subroutineBody.addChild(Token("symbol", "}"))
+        self.next()
 
+        return comp_subroutineBody
 
-
-        return comp_subroutineBody 
-    
     
     def compileVarDec(self):
         """
