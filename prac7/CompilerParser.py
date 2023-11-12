@@ -344,21 +344,26 @@ class CompilerParser:
         comp_statements = ParseTree("statements","")
         current_tk = self.current()
 
-    # Define a dictionary to map keywords to their respective compile methods
-    keyword_to_method = {
-        "if": self.compileIf,
-        "do": self.compileDo,
-        "let": self.compileLet,
-        "while": self.compileWhile,
-        "return": self.compileReturn,
-    }
+        while current_tk.getType() == "keyword" and current_tk.getValue() == "let" or current_tk.getValue() == "if" or current_tk.getValue() == "while" or current_tk.getValue() == "do" or current_tk.getValue() == "return":
+            #comp_statements.addChild(Token(current_tk.getType(), current_tk.getValue()))
+            current_tk = self.current()
+            
+            if self.have("keyword", "if"):
+                comp_statements.addChild(self.compileIf())
+            elif self.have("keyword", "do"):
+                comp_statements.addChild(self.compileDo())
+            elif self.have("keyword", "let"):
+                comp_statements.addChild(self.compileLet())
+            elif self.have("keyword", "while"):
+                comp_statements.addChild(self.compileWhile())
+            elif self.have("keyword", "return"):
+                comp_statements.addChild(self.compileReturn())
+            else:
+                raise ParseException()
 
-    # Loop as long as the current token's type is "keyword" and its value is in the dictionary
-    while current_tk.getType() == "keyword" and current_tk.getValue() in keyword_to_method:
-        comp_statements.addChild(keyword_to_method[current_tk.getValue()]())
-        current_tk = self.current()
 
-    return comp_statements    
+        return comp_statements 
+    
     
     def compileLet(self):
         """
@@ -566,6 +571,7 @@ if __name__ == "__main__":
     """
     tokens = []
 
+
     #parameterlist:
     tokens.append(Token("keyword", "int"))
     tokens.append(Token("identifier", "a"))
@@ -577,7 +583,7 @@ if __name__ == "__main__":
     tokens.append(Token("identifier", "c"))
     tokens.append(Token("symbol", ","))
     tokens.append(Token("identifier", "Test d"))
-    
+
     parser = CompilerParser(tokens)
     
     try:
