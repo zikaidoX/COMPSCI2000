@@ -175,7 +175,7 @@ class CompilerParser:
         self.mustBe("symbol",")") #symbol breaks here, it's supposed to be a { but only ( works
         class_compileSub.addChild(Token("symbol",")"))
         
-        self.next()
+        # self.next()
         # current_tk = self.current()
 
         class_compileSub.addChild(self.compileSubroutineBody())
